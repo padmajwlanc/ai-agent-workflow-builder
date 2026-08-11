@@ -142,6 +142,7 @@ async function main(req: Request, res: Response) {
           id
           name
           org_id
+          created_by
           organization {
             id
             quota_limit
@@ -163,6 +164,7 @@ async function main(req: Request, res: Response) {
     );
 
     const workflow = workflowData.workflows_by_pk;
+    const effectiveUserId = userId === "admin" ? workflow.created_by : userId;
 
     if (!workflow) {
       return res.status(404).json({
@@ -193,7 +195,7 @@ async function main(req: Request, res: Response) {
       `,
       {
         org_id: workflow.org_id,
-        user_id: userId,
+        user_id: effectiveUserId,
       }
     );
 
@@ -242,7 +244,7 @@ async function main(req: Request, res: Response) {
       `,
       {
         workflow_id: workflowId,
-        triggered_by: userId,
+        triggered_by: effectiveUserId,
       }
     );
 
