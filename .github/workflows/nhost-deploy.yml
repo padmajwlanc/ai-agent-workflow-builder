@@ -1,0 +1,29 @@
+name: Deploy Nhost
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nhost CLI
+        run: |
+          curl -L https://raw.githubusercontent.com/nhost/cli/main/install.sh | sh
+          echo "$HOME/.nhost/bin" >> "$GITHUB_PATH"
+
+      - name: Deploy to Nhost
+        env:
+          NHOST_PAT: ${{ secrets.NHOST_PAT }}
+        run: |
+          nhost login --pat "$NHOST_PAT"
+          nhost deployments new \
+            --subdomain qhdhzninoxahvtvpaytg \
+            --ref main \
+            --follow
