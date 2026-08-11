@@ -3,23 +3,48 @@ import { Request, Response } from "express";
 const GRAPHQL_URL = process.env.NHOST_GRAPHQL_URL!;
 const ADMIN_SECRET = process.env.NHOST_ADMIN_SECRET!;
 
-async function gql(query: string, variables: Record<string, any> = {}) {
-  const response = await fetch(GRAPHQL_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-hasura-admin-secret": ADMIN_SECRET,
-    },
-    body: JSON.stringify({ query, variables }),
-  });
+async function gql(
+  query: string,
+  variables: Record<string, any> = {}
+) {
+  const operation =
+    query.match(/(?:query|mutation)\s+(\w+)/)?.[1] || "unknown";
 
-  const result = await response.json();
+  console.log(`[GraphQL START] ${operation}`);
 
-  if (result.errors) {
-    throw new Error(result.errors[0].message);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 2500);
+
+  try {
+    const response = await fetch(GRAPHQL_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret": ADMIN_SECRET,
+      },
+      body: JSON.stringify({ query, variables }),
+      signal: controller.signal,
+    });
+
+    const result = await response.json();
+
+    console.log(`[GraphQL DONE] ${operation}`);
+
+    if (result.errors) {
+      throw new Error(result.errors[0].message);
+    }
+
+    return result.data;
+  } catch (error: any) {
+    console.error(
+      `[GraphQL ERROR] ${operation}:`,
+      error.message
+    );
+
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  return result.data;
 }
 
 async function updateStepRun(
