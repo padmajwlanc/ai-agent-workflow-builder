@@ -15,8 +15,7 @@ jobs:
 
       - name: Install Nhost CLI
         run: |
-          curl -L https://raw.githubusercontent.com/nhost/cli/main/install.sh | sh
-          echo "$HOME/.nhost/bin" >> "$GITHUB_PATH"
+          sudo curl -L https://raw.githubusercontent.com/nhost/nhost/main/cli/get.sh | bash
 
       - name: Deploy to Nhost
         env:
