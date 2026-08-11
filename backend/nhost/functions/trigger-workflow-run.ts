@@ -511,7 +511,7 @@ async function main(req: Request, res: Response) {
           id
         }
 
-        update_organizations_by_pk(
+        update_organisations_by_pk(
           pk_columns: { id: $org_id },
           _inc: { quota_used: 1 }
         ) {
