@@ -18,6 +18,7 @@ jobs:
           sudo curl -L https://raw.githubusercontent.com/nhost/nhost/main/cli/get.sh | bash
 
       - name: Deploy to Nhost
+        working-directory: backend
         env:
           NHOST_PAT: ${{ secrets.NHOST_PAT }}
         run: |
