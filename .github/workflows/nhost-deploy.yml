@@ -20,9 +20,12 @@ jobs:
       - name: Deploy to Nhost
         working-directory: backend
         env:
-          NHOST_PAT: ${{ secrets.NHOST_PAT }}
+          NHOST_EMAIL: ${{ secrets.NHOST_EMAIL }}
+          NHOST_PASSWORD: ${{ secrets.NHOST_PASSWORD }}
         run: |
-          nhost login --pat "$NHOST_PAT"
+          nhost login \
+            --email "$NHOST_EMAIL" \
+            --password "$NHOST_PASSWORD"
           nhost deployments new \
             --subdomain qhdhzninoxahvtvpaytg \
             --ref main \
